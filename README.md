@@ -34,11 +34,23 @@ $ cd task-manager
 # Установка проекта:
 # Установить зависимости
 $ npm install
+
+# Запустить создание таблиц
+$ npx prisma generate
+
+# Изменить DATABASE_URL в .env
+$ DATABASE_URL = postgresql://postgres:qwerty1234@localhost:5432/Test?schema=public
+
+# Запустить проект
+$ npm start
 ```
 
 ### Установка через Docker
 ```bash
 # Установка для Docker:
+# Изменить DATABASE_URL в .env
+$ DATABASE_URL = postgresql://postgres:qwerty1234@postgres:5432/Test?schema=public
+
 # Установка Docker образа и контейнеров
 $ docker-compose up
 ```
