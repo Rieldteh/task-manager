@@ -1,0 +1,157 @@
+/register:
+  post:
+    tags:
+      - Authentication
+    summary: Регистрация нового пользователя
+    description: Создает нового пользователя и возвращает его данные
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Alex"
+              email:
+                type: string
+                format: email
+                example: "helloworld@yandex.ru"
+              password:
+                type: string
+                format: password
+                example: "password123"
+            required:
+              - name
+              - email
+              - password
+    responses:
+      "200":
+        description: Успешная регистрация
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 12
+                    name:
+                      type: string
+                      example: "Alex"
+                    email:
+                      type: string
+                      format: email
+                      example: "helloworld@yandex.ru"
+                    password:
+                      type: string
+                      example: "$2a$10$E62Zki4pHyn5NvNwCRlWsexKDRyGQFMI1CSG12RvqCzzlBnGUBNki"
+                    role:
+                      type: string
+                      enum: [ADMIN, EMPLOYEE]
+                      example: "EMPLOYEE"
+      "500":
+        description: Ошибка сервера
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "User is already exist"
+
+/authentificate:
+  post:
+    tags:
+      - Authentication
+    summary: Аутентификация пользователя
+    description: Проверяет учетные данные пользователя и возвращает токен для доступа, если аутентификация прошла успешно
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                example: "hello@yandex.ru"
+              password:
+                type: string
+                format: password
+                example: "hello321"
+            required:
+              - email
+              - password
+    responses:
+      "200":
+        description: Успешная аутентификация
+        headers:
+          Set-Cookie:
+            description: Токен для доступа сохранен в httpOnly cookie
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE1LCJyb2xlIjoiRU1QTE9ZRUUiLCJpYXQiOjE3MzEyNjIxMjAsImV4cCI6MTczMTM0ODUyMH0.rJthiWh3ePPQpSKvjYlHT7l0tmxDSttB2TCwYrlRa1s"
+      "500":
+        description: Ошибка сервера, неверный пароль или проблема с аутентификацией
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Wrong password"
+
+/logout:
+  post:
+    tags:
+      - Authentication
+    summary: Выход из системы
+    description: Очищает токен доступа из cookies и завершает сессию пользователя
+    security:
+      - cookieAuth: []
+    responses:
+      "200":
+        description: Успешный выход из системы
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Logged out successfully"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        description: Ошибка сервера при попытке выйти из системы
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Unexpected error"

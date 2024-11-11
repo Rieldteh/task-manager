@@ -1,0 +1,397 @@
+/projects/{projectId}/tasks:
+  get:
+    tags:
+      - Tasks
+    summary: Получение всех задач проекта
+    description: Возвращает список всех задач, принадлежащих указанному проекту
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    security:
+      - cookieAuth: []
+    responses:
+      "200":
+        description: Список задач успешно получен
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tasks:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Task"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  post:
+    tags:
+      - Tasks
+    summary: Создание новой задачи
+    description: Создает новую задачу в указанном проекте
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Создать базу данных"
+              description:
+                type: string
+                example: "Спроектировать и реализовать структуру БД"
+              deadline:
+                type: string
+                format: date-time
+                example: "2024-04-15T18:00:00Z"
+    responses:
+      "200":
+        description: Задача успешно создана
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  $ref: "#/components/schemas/TaskWithAssignees"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}/tasks/{taskId}:
+  get:
+    tags:
+      - Tasks
+    summary: Получение информации о задаче
+    description: Возвращает детальную информацию о конкретной задаче
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    responses:
+      "200":
+        description: Информация о задаче успешно получена
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskInfo:
+                  $ref: "#/components/schemas/TaskWithAssignees"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  put:
+    tags:
+      - Tasks
+    summary: Обновление задачи
+    description: Обновляет информацию о существующей задаче
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Обновить базу данных"
+              description:
+                type: string
+                example: "Обновить структуру БД согласно новым требованиям"
+              deadline:
+                type: string
+                format: date-time
+                example: "2024-04-20T18:00:00Z"
+              status:
+                type: boolean
+                example: true
+    responses:
+      "200":
+        description: Задача успешно обновлена
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updTask:
+                  $ref: "#/components/schemas/Task"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  delete:
+    tags:
+      - Tasks
+    summary: Удаление задачи
+    description: Удаляет указанную задачу из проекта
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    responses:
+      "200":
+        description: Задача успешно удалена
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Task has been deleted"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}/tasks/{taskId}/assignees:
+  get:
+    tags:
+      - Tasks
+    summary: Получение списка исполнителей задачи
+    description: Возвращает список всех пользователей, назначенных на задачу
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    responses:
+      "200":
+        description: Список исполнителей успешно получен
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskUsers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}/tasks/{taskId}/assignees/{id}:
+  post:
+    tags:
+      - Tasks
+    summary: Добавление исполнителя к задаче
+    description: Назначает пользователя на задачу
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 3
+        description: ID пользователя
+    responses:
+      "200":
+        description: Исполнитель успешно добавлен к задаче
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskAssignees:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  delete:
+    tags:
+      - Tasks
+    summary: Удаление исполнителя из задачи
+    description: Удаляет пользователя из списка исполнителей задачи
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 3
+        description: ID пользователя
+    responses:
+      "200":
+        description: Исполнитель успешно удален из задачи
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskAssignees:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"

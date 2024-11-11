@@ -1,0 +1,118 @@
+/users:
+  get:
+    tags:
+      - Users
+    summary: Получить список всех пользователей
+    description: Возвращает полный список пользователей
+    security:
+      - cookieAuth: []
+    responses:
+      "200":
+        description: Успешное получение списка пользователей
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        description: Ошибка сервера или отказ в доступе
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Access denied"
+
+/users/{id}:
+  get:
+    tags:
+      - Users
+    summary: Получить информацию о пользователе
+    description: Возвращает информацию о конкретном пользователе
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+        description: ID пользователя
+    responses:
+      "200":
+        description: Успешное получение информации о пользователе
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        $ref: "#/components/responses/Error"
+
+  delete:
+    tags:
+      - Users
+    summary: Удалить пользователя
+    description: Удаляет пользователя
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+        description: ID пользователя
+    responses:
+      "200":
+        description: Пользователь успешно удален
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "User has been deleted"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        $ref: "#/components/responses/Error"

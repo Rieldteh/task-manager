@@ -1,0 +1,10 @@
+Error:
+  description: Ошибка сервера
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Task doesn't exist"

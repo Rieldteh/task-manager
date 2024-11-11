@@ -1,0 +1,89 @@
+User:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    name:
+      type: string
+      example: "John Doe"
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+    password:
+      type: string
+      example: "$2a$10$E62Zki4pHyn5NvNwCRlWsexKDRyGQFMI1CSG12RvqCzzlBnGUBNki"
+    role:
+      type: string
+      enum: [ADMIN, EMPLOYEE]
+      example: "EMPLOYEE"
+
+Task:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    title:
+      type: string
+      example: "Создать API"
+    description:
+      type: string
+      example: "Разработать REST API для проекта"
+    projectId:
+      type: integer
+      example: 1
+    deadline:
+      type: string
+      format: date-time
+      example: "2024-04-15T18:00:00Z"
+    status:
+      type: boolean
+      example: false
+
+Project:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    title:
+      type: string
+      example: "Новый веб-сайт"
+    description:
+      type: string
+      example: "Разработка корпоративного веб-сайта"
+    creatorId:
+      type: integer
+      example: 1
+    createdAt:
+      type: string
+      format: date-time
+      example: "2024-03-20T10:00:00Z"
+
+ProjectWithUsers:
+  allOf:
+    - $ref: "#/components/schemas/Project"
+    - type: object
+      properties:
+        creator:
+          $ref: "#/components/schemas/User"
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+
+TaskWithAssignees:
+  allOf:
+    - $ref: "#/components/schemas/Task"
+    - type: object
+      properties:
+        assignees:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"

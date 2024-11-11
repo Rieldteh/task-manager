@@ -1,0 +1,335 @@
+/projects:
+  get:
+    tags:
+      - Projects
+    summary: Получение всех проектов
+    description: Возвращает список всех проектов, доступных пользователю
+    responses:
+      "200":
+        description: Список проектов успешно получен
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projects:
+                  type: array
+                  items:
+                    $ref: "#components/schemas/Project"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  post:
+    tags:
+      - Projects
+    summary: Создание нового проекта
+    description: Создает новый проект с текущим пользователем в качестве создателя
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Новый веб-сайт"
+              description:
+                type: string
+                example: "Разработка корпоративного веб-сайта"
+            required:
+              - title
+    responses:
+      "200":
+        description: Проект успешно создан
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project:
+                  $ref: "#components/schemas/ProjectWithUsers"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}:
+  get:
+    tags:
+      - Projects
+    summary: Получение информации о проекте
+    description: Возвращает детальную информацию о конкретном проекте
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    responses:
+      "200":
+        description: Информация о проекте успешно получена
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectInfo:
+                  $ref: "#/components/schemas/ProjectWithUsers"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  put:
+    tags:
+      - Projects
+    summary: Обновление проекта
+    description: Обновляет информацию о существующем проекте
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Обновленный веб-сайт"
+              description:
+                type: string
+                example: "Обновленное описание проекта"
+    responses:
+      "200":
+        description: Проект успешно обновлен
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updProject:
+                  $ref: "#/components/schemas/Project"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+  delete:
+    tags:
+      - Projects
+    summary: Удаление проекта
+    description: Удаляет указанный проект и все связанные с ним задачи
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    responses:
+      "200":
+        description: Проект успешно удален
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Project has been deleted"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}/users:
+  get:
+    tags:
+      - Projects
+    summary: Получение списка участников проекта
+    description: Возвращает список всех пользователей, участвующих в проекте
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    responses:
+      "200":
+        description: Список участников успешно получен
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectUsers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+
+      "500":
+        $ref: "#/components/responses/Error"
+
+/projects/{projectId}/users/{id}:
+  post:
+    tags:
+      - Projects
+    summary: Добавление пользователя в проект
+    description: Добавляет пользователя в проект
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+        description: ID пользователя
+    responses:
+      "200":
+        description: Пользователь успешно добавлен в проект
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectUsers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        $ref: "#/components/responses/Error"
+
+  delete:
+    tags:
+      - Projects
+    summary: Удаление пользователя из проекта
+    description: Удаляет пользователя из проекта
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+        description: ID пользователя
+    responses:
+      "200":
+        description: Пользователь успешно удален из проекта
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectUsers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/User"
+      "401":
+        description: Пользователь не авторизован
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Not authorized"
+      "500":
+        $ref: "#/components/responses/Error"
